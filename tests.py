@@ -78,19 +78,49 @@ class TestBooksCollector:
         collector.delete_book_from_favorites("Отсутствующая книга")
         assert "Собачье сердце" in collector.get_list_of_favorites_books()
 
-    def test_get_books_genre(self, collector):
+    # ============ ТЕСТЫ ДЛЯ get_books_genre ============
+    
+    def test_get_books_genre_returns_full_dict(self, collector):
+        """Проверяет, что get_books_genre возвращает полный словарь книг и жанров"""
         collector.add_new_book("Мастер и Маргарита")
         collector.set_book_genre("Мастер и Маргарита", "Фантастика")
         collector.add_new_book("12 стульев")
         collector.set_book_genre("12 стульев", "Комедии")
+        collector.add_new_book("Война и мир")
+        collector.set_book_genre("Война и мир", "Роман")
         
         books_genre = collector.get_books_genre()
+        
         assert books_genre["Мастер и Маргарита"] == "Фантастика"
         assert books_genre["12 стульев"] == "Комедии"
-        assert len(books_genre) == 2
+        assert books_genre["Война и мир"] == "Роман"
+        assert len(books_genre) == 3
 
-    def test_get_book_genre_nonexistent(self, collector):
-        assert collector.get_book_genre("Неизвестная книга") is None
+    def test_get_books_genre_empty(self, collector):
+        """Проверяет, что get_books_genre возвращает пустой словарь, если книг нет"""
+        assert collector.get_books_genre() == {}
+
+    # ============ ТЕСТЫ ДЛЯ get_book_genre ============
+    
+    def test_get_book_genre_returns_genre_for_existing_book(self, collector):
+        """Проверяет, что get_book_genre возвращает жанр для существующей книги"""
+        collector.add_new_book("Мастер и Маргарита")
+        collector.set_book_genre("Мастер и Маргарита", "Мистика")
+        
+        genre = collector.get_book_genre("Мастер и Маргарита")
+        
+        assert genre == "Мистика"
+
+    def test_get_book_genre_returns_none_for_nonexistent_book(self, collector):
+        """Проверяет, что get_book_genre возвращает None для несуществующей книги"""
+        genre = collector.get_book_genre("Несуществующая книга")
+        assert genre is None
+
+    def test_get_book_genre_returns_empty_string_for_book_without_genre(self, collector):
+        """Проверяет, что get_book_genre возвращает пустую строку для книги без жанра"""
+        collector.add_new_book("Новая книга")
+        genre = collector.get_book_genre("Новая книга")
+        assert genre == ""
 
     def test_get_list_of_favorites_books_empty(self, collector):
         assert collector.get_list_of_favorites_books() == []
